@@ -51,35 +51,78 @@ void pruebas_creacion () {
     arbol_destruir (arbol);
 }
 
-void pruebas_insercion () {
-    pa2m_nuevo_grupo ("   Pruebas de insercion   ");
+void pruebas_insercion_y_borrado () {
+    pa2m_nuevo_grupo ("   Pruebas de insercion y borrado   ");
     abb_t* arbol = arbol_crear (comparar_manzanas, destructor_manzanas);
-    manzana_t* manzana_insertar;
-    manzana_insertar = crear_manzana(52, MANZANA_ROJA);
-    pa2m_afirmar(arbol_insertar(arbol, manzana_insertar) == 0, "Puedo insertar una manzana");
-    manzana_insertar = crear_manzana(122, MANZANA_VERDE);
-    pa2m_afirmar(arbol_insertar(arbol, manzana_insertar) == 0, "Puedo insertar una manzana");
-    manzana_insertar = crear_manzana(513, MANZANA_VERDE);
-    pa2m_afirmar(arbol_insertar(arbol, manzana_insertar) == 0, "Puedo insertar una manzana");
-    manzana_insertar = crear_manzana(21, MANZANA_ROJA);
-    pa2m_afirmar(arbol_insertar(arbol, manzana_insertar) == 0, "Puedo insertar una manzana");
-    manzana_insertar = crear_manzana(15, MANZANA_VERDE);
-    pa2m_afirmar(arbol_insertar(arbol, manzana_insertar) == 0, "Puedo insertar una manzana");
-    manzana_insertar = crear_manzana(76, MANZANA_VERDE);
-    pa2m_afirmar(arbol_insertar(arbol, manzana_insertar) == 0, "Puedo insertar una manzana");
-    manzana_insertar = crear_manzana(1, MANZANA_ROJA);
-    pa2m_afirmar(arbol_insertar(arbol, manzana_insertar) == 0, "Puedo insertar una manzana");
+    manzana_t* manzana_aux;
+    manzana_aux = crear_manzana(52, MANZANA_ROJA);
+    pa2m_afirmar(arbol_insertar(NULL, manzana_aux) == -1, "No puedo insertar en un arbol NULL");
+    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana roja (52g)");
+    manzana_aux = crear_manzana(122, MANZANA_VERDE);
+    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana verde (122g)");
+    manzana_aux = crear_manzana(513, MANZANA_VERDE);
+    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana verde (513g)");
+    manzana_aux = crear_manzana(21, MANZANA_ROJA);
+    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana roja (21g)");
+    manzana_aux = crear_manzana(15, MANZANA_VERDE);
+    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana verde (15g)");
+    manzana_aux = crear_manzana(76, MANZANA_VERDE);
+    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana verde (76g)");
+    manzana_aux = crear_manzana(1, MANZANA_ROJA);
+    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana roja (1g)");
+    manzana_aux = crear_manzana(90, MANZANA_VERDE);
+    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana roja (90g)");
 
     manzana_t* manzanas[10];
-
     size_t cantidad = arbol_recorrido_inorden(arbol, (void**)manzanas, 10);
-    for(size_t i=0;i<cantidad;i++)
-        printf("%i ", (*manzanas[i]).peso);
-    printf("\n");
+    bool son_todos_correctos = (*manzanas[0]).peso == 1 && (*manzanas[1]).peso == 15 && (*manzanas[2]).peso == 21 && (*manzanas[3]).peso == 52 &&
+                               (*manzanas[4]).peso == 76 && (*manzanas[5]).peso == 90 && (*manzanas[6]).peso == 122 && (*manzanas[7]).peso == 513;
+    pa2m_afirmar(cantidad == 8, "Hay 8 manzanas");
+    pa2m_afirmar(son_todos_correctos,"Todas las manzanas son correctas, probando con recorrido inorden");
+    
+    manzana_aux = crear_manzana (9999, MANZANA_ROJA);
+    pa2m_afirmar(arbol_borrar(NULL, manzana_aux) == -1, "No puedo borrar un elemento que no esta en el arbol");
+    (*manzana_aux).color = MANZANA_ROJA;
+    (*manzana_aux).peso = 52;
+    pa2m_afirmar(arbol_borrar(NULL, manzana_aux) == -1, "No puedo borrar en una arbol NULL");
+    pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar la raiz");
+    (*manzana_aux).color = MANZANA_ROJA;
+    (*manzana_aux).peso = 1;
+    pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar una hoja");
+    (*manzana_aux).color = MANZANA_VERDE;
+    (*manzana_aux).peso = 76;
+    pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar un nodo con un hijo");
+    (*manzana_aux).color = MANZANA_VERDE;
+    (*manzana_aux).peso = 122;
+    pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar un nodo con dos hijos");
+
+    cantidad = arbol_recorrido_preorden(arbol, (void**)manzanas, 10);
+    son_todos_correctos = (*manzanas[0]).peso == 21 && (*manzanas[1]).peso == 15 && (*manzanas[2]).peso == 90 && (*manzanas[3]).peso == 513;
+    pa2m_afirmar(cantidad == 4, "Quedan 4 manzanas");
+    pa2m_afirmar(son_todos_correctos,"Todas las manzanas restantes son correctas, probando con recorrido preorden");
+
+    (*manzana_aux).color = MANZANA_ROJA;
+    (*manzana_aux).peso = 21;
+    pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar la raiz");
+    (*manzana_aux).color = MANZANA_VERDE;
+    (*manzana_aux).peso = 513;
+    pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar una hoja");
+    (*manzana_aux).color = MANZANA_VERDE;
+    (*manzana_aux).peso = 90;
+    pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar otra hoja");
+    (*manzana_aux).color = MANZANA_VERDE;
+    (*manzana_aux).peso = 15;
+    pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar el ultimo elemento");
+    pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == -1, "No puedo borrar en un arbol vacio");
+    cantidad = arbol_recorrido_inorden(arbol, (void**)manzanas, 10);
+    pa2m_afirmar(cantidad == 0, "Quedan 0 manzanas");
+    pa2m_afirmar(arbol_vacio (arbol), "El arbol esta vacio");
+    destructor_manzanas (manzana_aux);
+    arbol_destruir(arbol);
 }
 
 int main (){
     pruebas_creacion ();
-    pruebas_insercion ();
+    pruebas_insercion_y_borrado ();
     pa2m_mostrar_reporte ();
 }

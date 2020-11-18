@@ -394,11 +394,10 @@ void arbol_destruir(abb_t* arbol){
         return;
     }
     
-    if (!(*arbol).nodo_raiz){
-        return;
+    if ((*arbol).nodo_raiz){
+        arbol_destruir_aux ((*arbol).nodo_raiz, (*arbol).destructor);
     }
 
-    arbol_destruir_aux ((*arbol).nodo_raiz, (*arbol).destructor);
     free (arbol);
     return;
 }
