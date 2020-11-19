@@ -276,7 +276,7 @@ void* arbol_buscar_aux (nodo_abb_t* nodo_actual, void* elemento, abb_comparador 
 }
 
 void* arbol_buscar(abb_t* arbol, void* elemento){
-    if(!arbol){
+    if(!arbol || !elemento){
         return NULL;
     }
     return arbol_buscar_aux ((*arbol).nodo_raiz, elemento, (*arbol).comparador);
@@ -287,6 +287,9 @@ void* arbol_buscar(abb_t* arbol, void* elemento){
 void* arbol_raiz(abb_t* arbol){
     
     if (!arbol){
+        return NULL;
+    }
+    if (!(*arbol).nodo_raiz){
         return NULL;
     }
     return (*(*arbol).nodo_raiz).elemento;
@@ -411,11 +414,11 @@ void arbol_destruir(abb_t* arbol){
 void abb_con_cada_elemento_aux (nodo_abb_t* nodo_actual, int recorrido, bool (*funcion)(void*, void*), void* extra, size_t* contador, bool *puede_seguir){
     
     if (recorrido == ABB_RECORRER_PREORDEN && *puede_seguir){
-        (*contador) ++;
         if (funcion ((*nodo_actual).elemento, extra)){
             *puede_seguir = false;
             return;
         }
+        (*contador) ++;
     }
 
     if ((*nodo_actual).izquierda) {
@@ -423,10 +426,11 @@ void abb_con_cada_elemento_aux (nodo_abb_t* nodo_actual, int recorrido, bool (*f
     }
 
     if (recorrido == ABB_RECORRER_INORDEN && *puede_seguir){
-        (*contador) ++;
         if (funcion ((*nodo_actual).elemento, extra)){
+            *puede_seguir = false;
             return;
         }
+        (*contador) ++;
     }
 
     if ((*nodo_actual).derecha) {
@@ -434,11 +438,11 @@ void abb_con_cada_elemento_aux (nodo_abb_t* nodo_actual, int recorrido, bool (*f
     }
 
     if (recorrido == ABB_RECORRER_POSTORDEN && *puede_seguir){
-        (*contador) ++;
         if (funcion ((*nodo_actual).elemento, extra)){
             *puede_seguir = false;
             return;
         }
+        (*contador) ++;
     }
 }
 
@@ -446,9 +450,16 @@ size_t abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*,
     if (!arbol) {
         return 0;
     }
+    if (!(*arbol).nodo_raiz) {
+        return 0;
+    }
     if (!funcion) {
         return 0;
     }
+    if (recorrido != ABB_RECORRER_INORDEN && recorrido != ABB_RECORRER_POSTORDEN && recorrido != ABB_RECORRER_PREORDEN){
+        return 0;
+    }
+
     size_t cantidad = 0;
     bool puede_seguir = true;
     abb_con_cada_elemento_aux((*arbol).nodo_raiz, recorrido, funcion, extra, &cantidad, &puede_seguir);
