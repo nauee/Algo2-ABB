@@ -34,16 +34,6 @@ int comparar_manzanas (void* manzana1, void* manzana2) {
     }
 }
 
-int comparar_caracteres (void* entero1, void* entero2){
-    if (*(char*) entero1 > *(char*) entero2){
-        return 1;
-    } else if (*(char*) entero1 < *(char*) entero2){
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
 void pruebas_creacion () {
     printf("\n");
     pa2m_nuevo_grupo ("   Pruebas de creacion   ");
@@ -84,13 +74,13 @@ void pruebas_insertar (abb_t* arbol) {
     pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana verde (76g)");
     manzana_aux = crear_manzana(1, MANZANA_ROJA);
     pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana roja (1g)");
-    manzana_aux = crear_manzana(90, MANZANA_VERDE);
-    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana roja (90g)");
-
+    manzana_aux = crear_manzana(76, MANZANA_VERDE);
+    pa2m_afirmar(arbol_insertar(arbol, manzana_aux) == 0, "Puedo insertar una manzana verde (76g) (repetida)");
+    
     manzana_t* manzanas[10];
     size_t cantidad = arbol_recorrido_inorden(arbol, (void**)manzanas, 10);
     bool son_todos_correctos = (*manzanas[0]).peso == 1 && (*manzanas[1]).peso == 15 && (*manzanas[2]).peso == 21 && (*manzanas[3]).peso == 52 &&
-                               (*manzanas[4]).peso == 76 && (*manzanas[5]).peso == 90 && (*manzanas[6]).peso == 122 && (*manzanas[7]).peso == 513;
+                               (*manzanas[4]).peso == 76 && (*manzanas[5]).peso == 76 && (*manzanas[6]).peso == 122 && (*manzanas[7]).peso == 513;
     pa2m_afirmar(cantidad == 8, "Hay 8 manzanas");
     pa2m_afirmar(son_todos_correctos,"Todas las manzanas son correctas, probando con recorrido inorden");
 }
@@ -130,10 +120,10 @@ void pruebas_borrar (abb_t* arbol) {
     strcpy((*manzana_aux).color, MANZANA_ROJA);
     (*manzana_aux).peso = 1;
     pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar una hoja");
-
+    
     manzana_t* manzanas[10];
     size_t cantidad = arbol_recorrido_postorden(arbol, (void**)manzanas, 10);
-    bool son_todos_correctos = (*manzanas[0]).peso == 15 && (*manzanas[1]).peso == 90 && (*manzanas[2]).peso == 76 && (*manzanas[3]).peso == 513 &&
+    bool son_todos_correctos = (*manzanas[0]).peso == 15 && (*manzanas[1]).peso == 76 && (*manzanas[2]).peso == 76 && (*manzanas[3]).peso == 513 &&
                                (*manzanas[4]).peso == 122 && (*manzanas[5]).peso == 21;
     pa2m_afirmar(cantidad == 6, "Quedan 6 manzanas");
     pa2m_afirmar(son_todos_correctos,"Todas las manzanas restantes son correctas, probando con recorrido postorden");
@@ -144,9 +134,9 @@ void pruebas_borrar (abb_t* arbol) {
     strcpy((*manzana_aux).color, MANZANA_VERDE);
     (*manzana_aux).peso = 122;
     pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar un nodo con dos hijos");
-
+    
     cantidad = arbol_recorrido_preorden(arbol, (void**)manzanas, 10);
-    son_todos_correctos = (*manzanas[0]).peso == 21 && (*manzanas[1]).peso == 15 && (*manzanas[2]).peso == 90 && (*manzanas[3]).peso == 513;
+    son_todos_correctos = (*manzanas[0]).peso == 21 && (*manzanas[1]).peso == 15 && (*manzanas[2]).peso == 76 && (*manzanas[3]).peso == 513;
     pa2m_afirmar(cantidad == 4, "Quedan 4 manzanas");
     pa2m_afirmar(son_todos_correctos,"Todas las manzanas restantes son correctas, probando con recorrido preorden");
 
@@ -157,7 +147,7 @@ void pruebas_borrar (abb_t* arbol) {
     (*manzana_aux).peso = 513;
     pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar una hoja");
     strcpy((*manzana_aux).color, MANZANA_VERDE);
-    (*manzana_aux).peso = 90;
+    (*manzana_aux).peso = 76;
     pa2m_afirmar(arbol_borrar(arbol, manzana_aux) == 0, "Puedo borrar otra hoja");
     strcpy((*manzana_aux).color, MANZANA_VERDE);
     (*manzana_aux).peso = 15;
@@ -181,6 +171,137 @@ void pruebas_funcionamiento_general () {
     arbol_destruir(arbol);
 }
 
+void recorrer_inorden (abb_t* arbol){
+    pa2m_nuevo_grupo ("     Recorrido inorden     ");
+    abb_t* arbol_vacio = arbol_crear (comparar_manzanas, destructor_manzanas);
+    size_t cantidad = 0;
+    manzana_t* manzanas[12];
+    bool todos_correctos = false;
+    cantidad = arbol_recorrido_inorden(NULL, (void**) manzanas, 100);
+    pa2m_afirmar(cantidad == 0, "No puedo recorrer un arbol nulo");
+    cantidad = arbol_recorrido_inorden(arbol_vacio, (void**) manzanas, 100);
+    pa2m_afirmar(cantidad == 0, "Recorrer un arbol vacio devuelve 0 elementos");
+    cantidad = arbol_recorrido_inorden(arbol, (void**) manzanas, 12);
+    todos_correctos = ((*manzanas[0]).peso == 5 && (*manzanas[1]).peso == 23 && (*manzanas[2]).peso == 45 && 
+                       (*manzanas[3]).peso == 65 && (*manzanas[4]).peso == 85 && (*manzanas[5]).peso == 99 &&
+                       (*manzanas[6]).peso == 104 && (*manzanas[7]).peso == 105 && (*manzanas[8]).peso == 125 &&
+                       (*manzanas[9]).peso == 154 && (*manzanas[10]).peso == 200 && (*manzanas[11]).peso == 543);
+    pa2m_afirmar (cantidad == 12, "Recorrer el arbol completo devuelve la cantidad correcta de elementos");
+    pa2m_afirmar (todos_correctos == true, "Los elementos en el vector luego de recorrer el arbol completo estan correctos");
+    cantidad = arbol_recorrido_inorden(arbol, (void**) manzanas, 100);
+    todos_correctos = ((*manzanas[0]).peso == 5 && (*manzanas[1]).peso == 23 && (*manzanas[2]).peso == 45 && 
+                       (*manzanas[3]).peso == 65 && (*manzanas[4]).peso == 85 && (*manzanas[5]).peso == 99 &&
+                       (*manzanas[6]).peso == 104 && (*manzanas[7]).peso == 105 && (*manzanas[8]).peso == 125 &&
+                       (*manzanas[9]).peso == 154 && (*manzanas[10]).peso == 200 && (*manzanas[11]).peso == 543);
+    pa2m_afirmar (cantidad == 12, "Recorrer el arbol con un tope mayor a la cantidad de elementos devuelve la cantidad correcta de elementos");
+    pa2m_afirmar (todos_correctos, "Los elementos en el vector luego de recorrer el arbol completo estan correctos");
+    cantidad = arbol_recorrido_inorden(arbol, (void**) manzanas, 5);
+    todos_correctos = ((*manzanas[0]).peso == 5 && (*manzanas[1]).peso == 23 && (*manzanas[2]).peso == 45 && 
+                       (*manzanas[3]).peso == 65 && (*manzanas[4]).peso == 85);
+    pa2m_afirmar (cantidad == 5, "Recorrer el arbol con un tope menor a la cantidad de elementos devuelve la cantidad correcta de elementos");
+    pa2m_afirmar (todos_correctos, "Los elementos en el vector luego de recorrer el arbol completo estan correctos");
+    arbol_destruir (arbol_vacio);
+}
+
+void recorrer_preorden (abb_t* arbol){
+    pa2m_nuevo_grupo ("     Recorrido preorden     ");
+    abb_t* arbol_vacio = arbol_crear (comparar_manzanas, destructor_manzanas);
+    size_t cantidad = 0;
+    manzana_t* manzanas[12];
+    bool todos_correctos = false;
+    cantidad = arbol_recorrido_preorden(NULL, (void**) manzanas, 100);
+    pa2m_afirmar(cantidad == 0, "No puedo recorrer un arbol nulo");
+    cantidad = arbol_recorrido_preorden(arbol_vacio, (void**) manzanas, 100);
+    pa2m_afirmar(cantidad == 0, "Recorrer un arbol vacio devuelve 0 elementos");
+    cantidad = arbol_recorrido_preorden(arbol, (void**) manzanas, 12);
+    todos_correctos = ((*manzanas[0]).peso == 104 && (*manzanas[1]).peso == 65 && (*manzanas[2]).peso == 23 && 
+                       (*manzanas[3]).peso == 5 && (*manzanas[4]).peso == 45 && (*manzanas[5]).peso == 85 &&
+                       (*manzanas[6]).peso == 99 && (*manzanas[7]).peso == 154 && (*manzanas[8]).peso == 125 &&
+                       (*manzanas[9]).peso == 105 && (*manzanas[10]).peso == 200 && (*manzanas[11]).peso == 543);
+    pa2m_afirmar (cantidad == 12, "Recorrer el arbol completo devuelve la cantidad correcta de elementos");
+    pa2m_afirmar (todos_correctos == true, "Los elementos en el vector luego de recorrer el arbol completo estan correctos");
+    cantidad = arbol_recorrido_preorden(arbol, (void**) manzanas, 100);
+    todos_correctos = ((*manzanas[0]).peso == 104 && (*manzanas[1]).peso == 65 && (*manzanas[2]).peso == 23 && 
+                       (*manzanas[3]).peso == 5 && (*manzanas[4]).peso == 45 && (*manzanas[5]).peso == 85 &&
+                       (*manzanas[6]).peso == 99 && (*manzanas[7]).peso == 154 && (*manzanas[8]).peso == 125 &&
+                       (*manzanas[9]).peso == 105 && (*manzanas[10]).peso == 200 && (*manzanas[11]).peso == 543);
+    pa2m_afirmar (cantidad == 12, "Recorrer el arbol con un tope mayor a la cantidad de elementos devuelve la cantidad correcta de elementos");
+    pa2m_afirmar (todos_correctos, "Los elementos en el vector luego de recorrer el arbol completo estan correctos");
+    cantidad = arbol_recorrido_preorden(arbol, (void**) manzanas, 5);
+    todos_correctos = ((*manzanas[0]).peso == 104 && (*manzanas[1]).peso == 65 && (*manzanas[2]).peso == 23 && 
+                       (*manzanas[3]).peso == 5 && (*manzanas[4]).peso == 45);
+    pa2m_afirmar (cantidad == 5, "Recorrer el arbol con un tope menor a la cantidad de elementos devuelve la cantidad correcta de elementos");
+    pa2m_afirmar (todos_correctos, "Los elementos en el vector luego de recorrer el arbol completo estan correctos");
+    arbol_destruir (arbol_vacio);
+}
+
+void recorrer_postorden (abb_t* arbol){
+    pa2m_nuevo_grupo ("     Recorrido postorden     ");
+    abb_t* arbol_vacio = arbol_crear (comparar_manzanas, destructor_manzanas);
+    size_t cantidad = 0;
+    manzana_t* manzanas[12];
+    bool todos_correctos = false;
+    cantidad = arbol_recorrido_postorden(NULL, (void**) manzanas, 100);
+    pa2m_afirmar(cantidad == 0, "No puedo recorrer un arbol nulo");
+    cantidad = arbol_recorrido_postorden(arbol_vacio, (void**) manzanas, 100);
+    pa2m_afirmar(cantidad == 0, "Recorrer un arbol vacio devuelve 0 elementos");
+    cantidad = arbol_recorrido_postorden(arbol, (void**) manzanas, 12);
+    todos_correctos = ((*manzanas[0]).peso == 5 && (*manzanas[1]).peso == 45 && (*manzanas[2]).peso == 23 && 
+                       (*manzanas[3]).peso == 99 && (*manzanas[4]).peso == 85 && (*manzanas[5]).peso == 65 &&
+                       (*manzanas[6]).peso == 105 && (*manzanas[7]).peso == 125 && (*manzanas[8]).peso == 543 &&
+                       (*manzanas[9]).peso == 200 && (*manzanas[10]).peso == 154 && (*manzanas[11]).peso == 104);
+    pa2m_afirmar (cantidad == 12, "Recorrer el arbol completo devuelve la cantidad correcta de elementos");
+    pa2m_afirmar (todos_correctos == true, "Los elementos en el vector luego de recorrer el arbol completo estan correctos");
+    cantidad = arbol_recorrido_postorden(arbol, (void**) manzanas, 100);
+    todos_correctos = ((*manzanas[0]).peso == 5 && (*manzanas[1]).peso == 45 && (*manzanas[2]).peso == 23 && 
+                       (*manzanas[3]).peso == 99 && (*manzanas[4]).peso == 85 && (*manzanas[5]).peso == 65 &&
+                       (*manzanas[6]).peso == 105 && (*manzanas[7]).peso == 125 && (*manzanas[8]).peso == 543 &&
+                       (*manzanas[9]).peso == 200 && (*manzanas[10]).peso == 154 && (*manzanas[11]).peso == 104);
+    pa2m_afirmar (cantidad == 12, "Recorrer el arbol con un tope mayor a la cantidad de elementos devuelve la cantidad correcta de elementos");
+    pa2m_afirmar (todos_correctos, "Los elementos en el vector luego de recorrer el arbol completo estan correctos");
+    cantidad = arbol_recorrido_postorden(arbol, (void**) manzanas, 5);
+    todos_correctos = ((*manzanas[0]).peso == 5 && (*manzanas[1]).peso == 45 && (*manzanas[2]).peso == 23 && 
+                       (*manzanas[3]).peso == 99 && (*manzanas[4]).peso == 85);
+    pa2m_afirmar (cantidad == 5, "Recorrer el arbol con un tope menor a la cantidad de elementos devuelve la cantidad correcta de elementos");
+    pa2m_afirmar (todos_correctos, "Los elementos en el vector luego de recorrer el arbol completo estan correctos");
+    arbol_destruir (arbol_vacio);
+}
+
+void pruebas_recorridos (){
+    abb_t* arbol = arbol_crear (comparar_manzanas, destructor_manzanas);
+    manzana_t* aux = NULL;
+    aux = crear_manzana (104, MANZANA_ROJA);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (65, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (154, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (23, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (85, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (125, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (200, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (5, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (45, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (99, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (105, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    aux = crear_manzana (543, MANZANA_VERDE);
+    arbol_insertar(arbol, aux);
+    
+    recorrer_inorden(arbol);
+    recorrer_preorden(arbol);
+    recorrer_postorden(arbol);
+    
+    arbol_destruir(arbol);
+}
+
 bool copiar_a_string (void* elemento, void* salida) {
     if (elemento) {
         char buffer[100] = "";
@@ -200,12 +321,12 @@ bool copiar_a_string_hasta_5 (void* elemento, void* salida) {
             }
             i++;
         }
-        if (cantidad_leida >= 5) {
-            return true;
-        }
         char buffer[100] = "";
         sprintf (buffer, "%s - %i | ", (*(manzana_t*)elemento).color, (*(manzana_t*)elemento).peso);
         strcat ((char*) salida, buffer);
+        if (cantidad_leida >= 4) {
+            return true;
+        }
     }
     return false;
 }
@@ -214,6 +335,11 @@ bool copiar_a_string_hasta_3_verdes (void* elemento, void* salida) {
     
     int manzanas_verdes = 0;
     int i = 0;
+    if (elemento) {
+        char buffer[100] = "";
+        sprintf (buffer, "%s - %i | ", (*(manzana_t*)elemento).color, (*(manzana_t*)elemento).peso);
+        strcat ((char*) salida, buffer);
+    }
     while (((char*)salida)[i]) {
         if ((((char*)salida)[i] == 'V')) {
             manzanas_verdes ++;
@@ -224,11 +350,6 @@ bool copiar_a_string_hasta_3_verdes (void* elemento, void* salida) {
         return true;
     }
 
-    if (elemento) {
-        char buffer[100] = "";
-        sprintf (buffer, "%s - %i | ", (*(manzana_t*)elemento).color, (*(manzana_t*)elemento).peso);
-        strcat ((char*) salida, buffer);
-    }
     return false;
 }
 
@@ -262,7 +383,7 @@ void pruebas_iterador_interno () {
     arbol_insertar(arbol, manzana_aux);
     manzana_aux = crear_manzana (87, MANZANA_ROJA);
     arbol_insertar(arbol, manzana_aux);
-
+    
     pa2m_afirmar (abb_con_cada_elemento (NULL, ABB_RECORRER_INORDEN, copiar_a_string, salida) == 0, "No puedo recorrer un arbol inexistente");
     pa2m_afirmar (abb_con_cada_elemento (arbol, 4, copiar_a_string, salida) == 0, "No puedo recorrer con un recorrido invalido");
     pa2m_afirmar (abb_con_cada_elemento (arbol, ABB_RECORRER_INORDEN, NULL, salida) == 0, "No puedo recorrer sin funcion de iteracion");
@@ -321,6 +442,8 @@ void pruebas_iterador_interno () {
 int main (){
     pruebas_creacion ();
     pruebas_funcionamiento_general ();
+    pruebas_recorridos ();
     pruebas_iterador_interno ();
     pa2m_mostrar_reporte ();
+    return 0;
 }

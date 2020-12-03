@@ -1,4 +1,5 @@
 #include "abb.h"
+#include <stdio.h>
 
 /******************************************************************************************** Arbol_crear ********************************************************************************************/
 
@@ -326,6 +327,10 @@ void arbol_recorrido_aux (nodo_abb_t* nodo_actual, void** array, size_t tamanio_
         arbol_recorrido_aux ((*nodo_actual).izquierda, array, tamanio_array, contador, recorrido);
     }
 
+    if (*contador == tamanio_array){
+        return;
+    }
+
     if (recorrido == ABB_RECORRER_INORDEN){
         array[*contador] = (*nodo_actual).elemento;
         (*contador) ++;
@@ -333,6 +338,10 @@ void arbol_recorrido_aux (nodo_abb_t* nodo_actual, void** array, size_t tamanio_
 
     if ((*nodo_actual).derecha) {
         arbol_recorrido_aux ((*nodo_actual).derecha, array, tamanio_array, contador, recorrido);
+    }
+
+    if (*contador == tamanio_array){
+        return;
     }
 
     if (recorrido == ABB_RECORRER_POSTORDEN){
@@ -414,11 +423,11 @@ void arbol_destruir(abb_t* arbol){
 void abb_con_cada_elemento_aux (nodo_abb_t* nodo_actual, int recorrido, bool (*funcion)(void*, void*), void* extra, size_t* contador, bool *puede_seguir){
     
     if (recorrido == ABB_RECORRER_PREORDEN && *puede_seguir){
+        (*contador) ++;
         if (funcion ((*nodo_actual).elemento, extra)){
             *puede_seguir = false;
             return;
         }
-        (*contador) ++;
     }
 
     if ((*nodo_actual).izquierda) {
@@ -426,11 +435,11 @@ void abb_con_cada_elemento_aux (nodo_abb_t* nodo_actual, int recorrido, bool (*f
     }
 
     if (recorrido == ABB_RECORRER_INORDEN && *puede_seguir){
+        (*contador) ++;
         if (funcion ((*nodo_actual).elemento, extra)){
             *puede_seguir = false;
             return;
         }
-        (*contador) ++;
     }
 
     if ((*nodo_actual).derecha) {
@@ -438,11 +447,11 @@ void abb_con_cada_elemento_aux (nodo_abb_t* nodo_actual, int recorrido, bool (*f
     }
 
     if (recorrido == ABB_RECORRER_POSTORDEN && *puede_seguir){
+        (*contador) ++;
         if (funcion ((*nodo_actual).elemento, extra)){
             *puede_seguir = false;
             return;
         }
-        (*contador) ++;
     }
 }
 
