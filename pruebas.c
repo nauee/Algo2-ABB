@@ -25,6 +25,9 @@ void destructor_manzanas (void* manzana) {
 }
 
 int comparar_manzanas (void* manzana1, void* manzana2) {
+    if (!manzana1 || !manzana2){
+        return 0;
+    }
     if ((*(manzana_t*) manzana1).peso > (*(manzana_t*) manzana2).peso){
         return 1;
     } else if ((*(manzana_t*) manzana1).peso < (*(manzana_t*) manzana2).peso){
@@ -268,6 +271,9 @@ void recorrer_postorden (abb_t* arbol){
 }
 
 void pruebas_recorridos (){
+    printf("\n");
+    pa2m_nuevo_grupo("     Pruebas recorridos     ");
+    printf("\n");
     abb_t* arbol = arbol_crear (comparar_manzanas, destructor_manzanas);
     manzana_t* aux = NULL;
     aux = crear_manzana (104, MANZANA_ROJA);

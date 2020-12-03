@@ -1,21 +1,11 @@
 #include "abb.h"
 #include <stdio.h>
 
+#define NINGUNO 0
+#define IZQUIERDO -1
+#define DERECHO 1
+
 /******************************************************************************************** Arbol_crear ********************************************************************************************/
-
-/*
-typedef struct abb{
-  nodo_abb_t* nodo_raiz;
-  abb_comparador comparador;
-  abb_liberar_elemento destructor;
-} abb_t;
-
-typedef struct nodo_abb {
-  void* elemento;
-  struct nodo_abb* izquierda;
-  struct nodo_abb* derecha;
-} nodo_abb_t;
-*/
 
 abb_t* arbol_crear(abb_comparador comparador, abb_liberar_elemento destructor){
     
@@ -48,8 +38,6 @@ nodo_abb_t* crear_nodo (void* elemento) {
         return NULL;
     } else {
         (*nodo).elemento = elemento;
-        (*nodo).izquierda = NULL;
-        (*nodo).derecha = NULL;
         return nodo;
     }
 
@@ -136,13 +124,13 @@ void borrar_nodo_hoja (nodo_abb_t* padre, nodo_abb_t* nodo_borrar, abb_t* arbol)
 */
 void borrar_nodo_un_hijo (nodo_abb_t* padre, nodo_abb_t* nodo_borrar, abb_t* arbol) {
     
-    int lado;
+    int lado_hijo;
     if (!padre) {
-        lado = 0;
+        lado_hijo = NINGUNO;
     } else if ((*padre).izquierda == nodo_borrar) {
-        lado = -1;
+        lado_hijo = IZQUIERDO;
     } else {
-        lado = 1;
+        lado_hijo = DERECHO;
     }
 
     nodo_abb_t* aux = (*nodo_borrar).izquierda;
@@ -152,9 +140,9 @@ void borrar_nodo_un_hijo (nodo_abb_t* padre, nodo_abb_t* nodo_borrar, abb_t* arb
     }
     free (nodo_borrar);
 
-    if (lado == 0){
+    if (lado_hijo == NINGUNO){
         (*arbol).nodo_raiz = aux;
-    } else if (lado == -1){
+    } else if (lado_hijo == IZQUIERDO){
         (*padre).izquierda = aux;
     } else {
         (*padre).derecha = aux;
@@ -184,11 +172,11 @@ void borrar_nodo_dos_hijos (nodo_abb_t* padre, nodo_abb_t* nodo_borrar, abb_t* a
     nodo_abb_t* reemplazo;
 
     if (!padre) {
-        lado = 0;
+        lado = NINGUNO;
     } else if ((*padre).izquierda == nodo_borrar) {
-        lado = -1;
+        lado = IZQUIERDO;
     } else {
-        lado = 1;
+        lado = DERECHO;
     }
 
     if (!padre_reemplazo) {
@@ -203,7 +191,7 @@ void borrar_nodo_dos_hijos (nodo_abb_t* padre, nodo_abb_t* nodo_borrar, abb_t* a
     if (!padre) {
         (*arbol).nodo_raiz = reemplazo;
     } else {
-        if (lado == -1) {
+        if (lado == IZQUIERDO) {
             (*padre).izquierda = reemplazo;
         } else {
             (*padre).derecha = reemplazo;
@@ -456,6 +444,7 @@ void abb_con_cada_elemento_aux (nodo_abb_t* nodo_actual, int recorrido, bool (*f
 }
 
 size_t abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*, void*), void* extra){
+    
     if (!arbol) {
         return 0;
     }
@@ -473,5 +462,7 @@ size_t abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*,
     bool puede_seguir = true;
     abb_con_cada_elemento_aux((*arbol).nodo_raiz, recorrido, funcion, extra, &cantidad, &puede_seguir);
     return cantidad;
+
 }
+
 /*****************************************************************************************************************************************************************************************************/
